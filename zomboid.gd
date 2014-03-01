@@ -17,11 +17,16 @@ var rule2 = Vector2(0,0)
 var delta = 0
 var label = Label.new()
 var dest_rect = Rect2(Vector2(0,0), Vector2(1,1))
-
+var id
+var brain = null
 var font = Font.new()
-
-
 var state = "roaming"
+
+func set_brain(b):
+	brain = b
+	
+func get_brain():
+	return brain
 
 func set_destination(d):
 	destination = d
@@ -49,15 +54,14 @@ func get_velocity():
 		return ndir * speed
 		
 	return Vector2(0,0)
-	pass
 	
 func set_dest_rect(rect):
 	dest_rect = rect
 
 func _ready():
-	set_process(true)
+	#set_process(true)
+	label.set_pos(Vector2(-16,-16))
 	add_child(label)
-	pass
 	
 func init(d):
 	delta = d
@@ -65,54 +69,66 @@ func init(d):
 	var rand_chase = delta
 	roam_speed = rand_roam * roam_speed
 	chase_speed = rand_chase * chase_speed
-	#print(rand_roam)
-	#print(rand_chase)
-	pass
 	
-func _process(delta):
+func update_brain():
+	if brain != null:
+		brain.update(self)
+		
+func process(delta):
+	
 	var pos = get_pos()
+	var vel = get_velocity()
 	if (state == "roaming"):
 		speed = roam_speed
 		if (destination == null):
 			#pick a random spot around
-			var d = Vector2(pos.x + (randf() * 20), pos.y + (randf() * 20))
+			#var d = Vector2(pos.x + ((randf() * 20)-10), pos.y + ((randf() * 20)-10))
+			var d = Vector2(((randf() * 20)-10), ((randf() * 20)-10))
 			set_destination(d)
 			dest_rect = Rect2(destination, Vector2(get_zomb_size(),get_zomb_size()))
 		
 		var r = Rect2(destination, Vector2(size,size))
 		if (r.has_point(pos)):
 			destination = null
+			
+		if (brain != null):
+			var b_vel = brain.get_velocity(self)
+			vel += b_vel
 	elif (state == "chasing"):
 		speed = chase_speed
-		
+		var r = Rect2(destination, Vector2(size,size))
+		print(destination)
+		print(pos)
+		print(r.has_point(pos))
+		if (r.has_point(pos)):
+			destination = null
 			
 		if (destination == null):
 			state = "roaming"
-		#else:
-		#	var r = Rect2(destination, Vector2(size,size))
-		#	if (r.has_point(pos)):
-		#		destination = null
+			
+		update()
 	elif (state == "eating"):
 		pass
 	else:
 		state = "roaming"
+	
+	
+	
 		
-	#set_rot(get_rot() + delta)
+	set_pos(pos + (vel * delta))
+		
+	label.set_text(str(id) + ": " + state)
 	#update()
-	#print(rule1*10)
-	label.set_text(state)	
-	#rotate towards the destination
-	#print(speed)
+
 	pass
 
 
 func _draw():
 	var hsize = size / 2
 	var rect = Rect2(Vector2(-hsize, -hsize), Vector2(size, size))
-	#draw_rect(rect, color)
+	draw_rect(rect, color)
 	#draw_debug(hsize)
-	#draw_state(hsize)
-	#draw_dest_rect()
+	draw_dest_rect()
 	
 func draw_debug(hsize):
 	draw_line(Vector2(-hsize, -hsize), Vector2(hsize, -hsize), Color(0,0,0), 4)
@@ -120,10 +136,9 @@ func draw_debug(hsize):
 	draw_line(Vector2(0,0), rule2*10, Color(0,0,1), 2)
 	draw_line(Vector2(0,0), get_velocity()*10, Color(0,1,1), 2)
 	
-func draw_state(hsize):
-	#font.set_height(16)
-	#draw_string(font, get_pos(), state)
-	label.set_text(state)
-	
 func draw_dest_rect():
-	draw_rect(dest_rect, Color(0,0,1))
+	#print("dest_rect",dest_rect,randf())
+	#var p = get_pos() - dest_rect.pos
+	#var r = Rect2(p, dest_rect.size)
+	var r = dest_rect
+	draw_rect(r, Color(0,0,(id*50.0)/255.0))
