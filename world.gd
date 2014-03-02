@@ -12,6 +12,7 @@ const zomb_brain_instance = preload("brain.gd")
 const zomb_brain_herging_instance = preload("brain_herding.gd")
 const zomb_brain_spacing_instance = preload("brain_spacing.gd")
 const zomb_brain_speedmatching_instance = preload("brain_speedmatching.gd")
+const zomb_brain_chasing_instance = preload("brain_chasing.gd")
 
 class Test1:
 	extends Node2D
@@ -32,6 +33,7 @@ func _ready():
 	set_process_input(true)
 	brain1.add_component("herding", zomb_brain_herging_instance.new())
 	brain1.add_component("spacing", zomb_brain_spacing_instance.new())
+	brain1.add_component("chasing", zomb_brain_chasing_instance.new())
 	#brain1.add_component("speedmatching", zomb_brain_speedmatching_instance.new())
 	
 	#print(herd1)

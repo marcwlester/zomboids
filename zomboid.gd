@@ -12,8 +12,6 @@ var destination = null
 var speed = 40
 var chase_speed = 40
 var roam_speed = 20
-var rule1 = Vector2(0,0)
-var rule2 = Vector2(0,0)
 var delta = 0
 var label = Label.new()
 var dest_rect = Rect2(Vector2(0,0), Vector2(1,1))
@@ -21,6 +19,8 @@ var id
 var brain = null
 var font = Font.new()
 var state = "roaming"
+var chase_cooldown = 10.0 #seconds
+var chase_cooldown_timer = 0.0
 
 func set_brain(b):
 	brain = b
@@ -38,11 +38,9 @@ func get_destination():
 func set_state(s):
 	state = s
 	
-func set_rule1(r):
-	rule1 = r
+func get_state():
+	return state
 	
-func set_rule2(r):
-	rule2 = r
 	
 func get_zomb_size():
 	return size
@@ -70,6 +68,12 @@ func init(d):
 	roam_speed = rand_roam * roam_speed
 	chase_speed = rand_chase * chase_speed
 	
+func enable_chase(d):
+	if chase_cooldown_timer <= 0:
+		chase_cooldown_timer = chase_cooldown
+		state = "chasing"
+		destination = d
+	
 func update_brain():
 	if brain != null:
 		brain.update(self)
@@ -78,19 +82,31 @@ func process(delta):
 	
 	var pos = get_pos()
 	var vel = get_velocity()
+	
 	if (state == "roaming"):
 		speed = roam_speed
+		if (chase_cooldown_timer > 0):
+			chase_cooldown_timer -= delta
+			
 		if (destination == null):
 			#pick a random spot around
 			#var d = Vector2(pos.x + ((randf() * 20)-10), pos.y + ((randf() * 20)-10))
 			var d = Vector2(((randf() * 20)-10), ((randf() * 20)-10))
 			set_destination(d)
 			dest_rect = Rect2(destination, Vector2(get_zomb_size(),get_zomb_size()))
+			dest_rect.pos.x -= get_zomb_size() / 2
+			dest_rect.pos.y -= get_zomb_size() / 2
 		
-		var r = Rect2(destination, Vector2(size,size))
-		if (r.has_point(pos)):
-			destination = null
-			dest_rect = Rect2(Vector2(0,0), Vector2(1,1))
+		#var r = Rect2(destination, Vector2(size,size))
+		if dest_rect != null:
+			if (dest_rect.has_point(pos)):
+				destination = null
+				#dest_rect = Rect2(Vector2(0,0), Vector2(1,1))
+				dest_rect = null
+			
+		var chase = brain.get_component("chasing").get_chase(self)
+		if (chase != null):
+			enable_chase(chase)
 			
 		if (brain != null):
 			var b_vel = Vector2(0,0)
@@ -134,14 +150,8 @@ func _draw():
 	var hsize = size / 2
 	var rect = Rect2(Vector2(-hsize, -hsize), Vector2(size, size))
 	draw_rect(rect, color)
-	#draw_debug(hsize)
 	#draw_dest_rect(hsize)
 	
-func draw_debug(hsize):
-	draw_line(Vector2(-hsize, -hsize), Vector2(hsize, -hsize), Color(0,0,0), 4)
-	draw_line(Vector2(0,0), rule1*10, Color(0,1,0), 2)
-	draw_line(Vector2(0,0), rule2*10, Color(0,0,1), 2)
-	draw_line(Vector2(0,0), get_velocity()*10, Color(0,1,1), 2)
 	
 func draw_dest_rect(hsize):
 	#print("dest_rect",dest_rect,randf())
