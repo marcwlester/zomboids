@@ -45,7 +45,11 @@ func _ready():
 		#herd1.add_zomb(z)
 		var zz = zomb_db.create_zomb(randf(), Vector2((convert(randf()*1000, TYPE_INT) % 400)-200, (convert(randf()*1000, TYPE_INT) % 400)-200), brain1)
 		add_child(zz)
-		
+	
+	zomb_db.get_zomb(15).zomb.set_state("rock")
+	print(zomb_db.get_zomb(15).zomb.id)
+	print(zomb_db.get_zomb(16).zomb.id)
+	print(zomb_db.get_zomb(17).zomb.id)
 	#print(herd1.get_center(herd1.zombs[0]))
 	#herd1.set_destination(Vector2(0,0))
 	get_node("camera").set_pos(Vector2(0,0))
@@ -93,6 +97,10 @@ func _input(event):
 	pass
 	
 func _draw():
-	draw_circle(Vector2(0,0), 8, Color(1,1,1))
+	draw_circle(Vector2(0,0), 1, Color(1,1,1))
 	draw_circle(brain1.get_component("herding").center, 16, Color(0, 0, 1))
+	draw_circle(zomb_db.get_zomb(15).zomb.get_pos(), 64, Color(1,1,1))
+	draw_circle(zomb_db.get_zomb(15).zomb.get_pos(), 32, Color(1,0,1))
+	draw_line(zomb_db.get_zomb(1).zomb.get_pos(), brain1.get_component("spacing").get_velocity(zomb_db.get_zomb(1).zomb)*10, Color(0,0,0))
+	#print(brain1.get_component("spacing").tests)
 	pass

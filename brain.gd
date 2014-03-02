@@ -21,3 +21,4 @@ func get_velocity(z):
 		v += components[name].get_velocity(z)
 		
 	return v
+	

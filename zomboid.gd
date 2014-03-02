@@ -90,16 +90,20 @@ func process(delta):
 		var r = Rect2(destination, Vector2(size,size))
 		if (r.has_point(pos)):
 			destination = null
+			dest_rect = Rect2(Vector2(0,0), Vector2(1,1))
 			
 		if (brain != null):
-			var b_vel = brain.get_velocity(self)
+			var b_vel = Vector2(0,0)
+			b_vel += brain.get_component("spacing").get_velocity(self)
 			vel += b_vel
 	elif (state == "chasing"):
 		speed = chase_speed
 		var r = Rect2(destination, Vector2(size,size))
-		print(destination)
-		print(pos)
-		print(r.has_point(pos))
+			
+		if (brain != null):
+			var b_vel = Vector2(0,0)
+			b_vel += brain.get_component("spacing").get_velocity(self)
+			vel += b_vel
 		if (r.has_point(pos)):
 			destination = null
 			
@@ -109,6 +113,9 @@ func process(delta):
 		update()
 	elif (state == "eating"):
 		pass
+	elif (state == "rock"):
+		state = "rock"
+		delta = 0
 	else:
 		state = "roaming"
 	
@@ -128,7 +135,7 @@ func _draw():
 	var rect = Rect2(Vector2(-hsize, -hsize), Vector2(size, size))
 	draw_rect(rect, color)
 	#draw_debug(hsize)
-	draw_dest_rect()
+	#draw_dest_rect(hsize)
 	
 func draw_debug(hsize):
 	draw_line(Vector2(-hsize, -hsize), Vector2(hsize, -hsize), Color(0,0,0), 4)
@@ -136,9 +143,15 @@ func draw_debug(hsize):
 	draw_line(Vector2(0,0), rule2*10, Color(0,0,1), 2)
 	draw_line(Vector2(0,0), get_velocity()*10, Color(0,1,1), 2)
 	
-func draw_dest_rect():
+func draw_dest_rect(hsize):
 	#print("dest_rect",dest_rect,randf())
 	#var p = get_pos() - dest_rect.pos
 	#var r = Rect2(p, dest_rect.size)
 	var r = dest_rect
-	draw_rect(r, Color(0,0,(id*50.0)/255.0))
+	r.pos.x -= hsize
+	r.pos.y -= hsize
+	draw_rect(r, Color(0,0,1))
+	if destination != null:
+		#print(destination)
+		draw_rect(Rect2(destination, Vector2(size,size)), Color(0,1,0))
+	

@@ -13,3 +13,4 @@ func update(z):
 	
 func get_velocity(z):
 	return (avg_velocity) / factor
+	

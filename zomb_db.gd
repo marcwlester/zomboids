@@ -32,3 +32,4 @@ func delete_zomb(index):
 	
 func get_keys():
 	return zombs.keys()
+	
