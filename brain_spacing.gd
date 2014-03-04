@@ -25,8 +25,6 @@ func get_velocity(z):
 			var len = diff.length_squared()
 			var test = size2 - len
 			tests[z.id][i] = test
-			if (z.id == 1):
-				print(i,":", z.id, "-", test)
 				
 			#if diff.length_squared() < (size2):
 			if test >= 0:

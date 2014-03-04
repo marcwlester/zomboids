@@ -31,7 +31,6 @@ func get_chase(z):
 			if test >= closest:
 				closest = test
 				chase = chasing[i].destination
-				pass
 				
 	return chase
 	
